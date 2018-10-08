@@ -1,6 +1,8 @@
 {
   "name": "create-react-ts-app",
   "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mbrn/create-react-ts-app#readme",
   "private": true,
   "repository": {
     "type": "git",
@@ -12,7 +14,6 @@
   "bugs": {
     "url": "https://github.com/mbrn/create-react-ts-app/issues"
   },
-  "homepage": "https://github.com/mbrn/create-react-ts-app#readme",
   "scripts": {
     "build": "yarn run clean-dist && webpack -p --config=configs/webpack/prod.js",
     "clean-dist": "rm -f -r -d dist",
@@ -60,7 +61,10 @@
     "webpack-dev-server": "^3.1.8",
     "webpack-merge": "^4.1.4"
   },
-  "main": "index.js",
-  "dependencies": {},
-  "description": ""
+  "dependencies": {
+    "fs-extra": "^5.0.0"
+  },
+  "bin": {
+    "create-react-ts-app": "./bin/create-react-ts-app.js"
+  }
 }
