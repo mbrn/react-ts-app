@@ -1,18 +1,18 @@
 {
-  "name": "create-react-ts-app",
+  "name": "react-ts-app",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://github.com/mbrn/create-react-ts-app#readme",
-  "private": true,
+  "homepage": "https://github.com/mbrn/react-ts-app#readme",
+  "private": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mbrn/create-react-ts-app.git"
+    "url": "git+https://github.com/mbrn/react-ts-app.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Mehmet Baran",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mbrn/create-react-ts-app/issues"
+    "url": "https://github.com/mbrn/react-ts-app/issues"
   },
   "scripts": {
     "build": "yarn run clean-dist && webpack -p --config=configs/webpack/prod.js",
@@ -65,6 +65,6 @@
     "fs-extra": "^5.0.0"
   },
   "bin": {
-    "create-react-ts-app": "./bin/create-react-ts-app.js"
+    "react-ts-app": "./bin/react-ts-app.js"
   }
 }
