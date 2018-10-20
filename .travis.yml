@@ -1,0 +1,15 @@
+language: node_js
+sudo: false
+node_js:
+- "8"
+- "10"
+cache:
+  directories:
+    - "node_modules"
+script: echo "npm test temporarily disabled"    
+deploy:
+  provider: npm
+  email: "mehmetbaran@mehmetbaran.net"
+  api_key: "$NPM_TOKEN"
+  on:
+    bracnh: master
