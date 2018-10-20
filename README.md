@@ -11,5 +11,5 @@ A react boilerplate which includes React, Typescript, Webpack, Babel, HMR
 ## Installation
     npm install react-ts-app -g
 
-### Start Proxy Server
+### Usage
     react-ts-app <project name>
