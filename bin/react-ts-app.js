@@ -1,36 +1,32 @@
 #!/usr/bin/env node
 
-const fs = require('fs-extra');
-const path = require('path');
-const { exec } = require('child_process');
+const buildPackageJson = require('./utils/buildPackageJson');
+const copyAppFolders = require('./utils/copyAppFolders');
+const executeCommand = require('./utils/executeCommand');
+const writeAppFiles = require('./utils/writeAppFiles');
+const writePackageJson = require('./utils/writePackageJson');
 
+<<<<<<< HEAD
 const packageJson = require('../package.json');
 const filesToCopy = ['.babelrc', 'index.tsx', 'tsconfig.json'];
 const foldersToCopy = ['configs', 'public', 'src'];
+=======
+const targetFolder = process.argv[2];
+>>>>>>> pr/9
 
-// create folder and initialize npm
-exec(`mkdir ${process.argv[2]} && cd ${process.argv[2]}`,
-  (initErr, initStdout, initStderr) => {
-    if (initErr) {
-      console.error(`Everything was fine, then it wasn't: ${initErr}`);
-      return;
-    }
+const folderInitCommand = `mkdir ${targetFolder} && cd ${targetFolder}`;
+const npmInitCommand = `cd ${targetFolder} && npm install`;
 
+executeCommand(folderInitCommand, 'folder')
+  .then(() => {
     // replace the default scripts, with the webpack scripts in package.json
-    let newPckJson = {...packageJson};
-    newPckJson.name = process.argv[2];
-    newPckJson.version = "1.0.0";
-    delete newPckJson.homepage;
-    delete newPckJson.repository;
-    delete newPckJson.keywords;
-    delete newPckJson.author;
-    delete newPckJson.license;
-    delete newPckJson.bugs;
-    delete newPckJson.bin;
-    delete newPckJson.dependencies["fs-extra"];
-    const data = JSON.stringify(newPckJson, null, "\t");
-    fs.writeFile(`${process.argv[2]}/package.json`, data, err2 => err2 || true);
+    const packageJson = buildPackageJson();
+    writePackageJson(packageJson);
 
+    writeAppFiles();
+    copyAppFolders();
+
+<<<<<<< HEAD
     // Create .gitignore
     fs.writeFile(`${process.argv[2]}/.gitignore`, 'node_modules', err2 => err2 || true)
 
@@ -44,15 +40,14 @@ exec(`mkdir ${process.argv[2]} && cd ${process.argv[2]}`,
         .catch(err => console.error(err));
     }
   
+=======
+>>>>>>> pr/9
     // installing dependencies
-    exec(`cd ${process.argv[2]} && npm install`,
-      (npmErr, npmStdout, npmStderr) => {
-        if (npmErr) {
-          console.error(`it's always npm, ain't it? ${npmErr}`);
-          return;
-        }
-        console.log("Everything ok");
-      },
-    );
-  },
-);
+    return executeCommand(npmInitCommand, 'npm');
+  })
+  .then(() => {
+    console.log('Everything ok');
+  })
+  .catch((err) => {
+    console.error(`Everything was fine, then it wasn't: ${err}`);
+  });
