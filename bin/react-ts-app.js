@@ -32,7 +32,7 @@ exec(`mkdir ${process.argv[2]} && cd ${process.argv[2]}`,
     fs.writeFile(`${process.argv[2]}/package.json`, data, err2 => err2 || true);
 
     // Create .gitignore
-    // fs.writeFile(`${process.argv[2]}/.gitignore`, 'node_modules', err, err2 => err2 || true)
+    fs.writeFile(`${process.argv[2]}/.gitignore`, 'node_modules', err2 => err2 || true)
 
     for (let i = 0; i < filesToCopy.length; i += 1) {
       fs.createReadStream(path.join(__dirname, `../${filesToCopy[i]}`))
