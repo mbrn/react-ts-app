@@ -3,7 +3,7 @@ const path = require('path');
 
 const targetFolder = process.argv[2];
 
-const filesToCopy = ['.babelrc', '.gitignore', 'index.tsx', 'tsconfig.json'];
+const filesToCopy = ['.babelrc', 'index.tsx', 'tsconfig.json'];
 
 const writeAppFiles = () => {
   for (const file of filesToCopy) {
@@ -11,6 +11,8 @@ const writeAppFiles = () => {
       fs.createWriteStream(`${targetFolder}/${file}`)
     );
   }
+
+  fs.writeFile(`${targetFolder}/.gitignore`, 'node_modules', () => {});
 };
 
 module.exports = writeAppFiles;
