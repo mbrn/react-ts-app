@@ -8,29 +8,46 @@ const packageJson = require('../package.json');
 const filesToCopy = ['.babelrc', '.gitignore', 'index.tsx', 'tsconfig.json'];
 const foldersToCopy = ['configs', 'public', 'src'];
 
-// create folder and initialize npm
-exec(
-  `mkdir ${process.argv[2]} && cd ${process.argv[2]}`,
-  (initErr, initStdout, initStderr) => {
-    if (initErr) {
-      console.error(`Everything was fine, then it wasn't: ${initErr}`);
-      return;
-    }
+const executeCommand = (command, id) =>
+  new Promise((resolve) => {
+    exec(command, (err, stdout, stderr) => {
+      if (err) {
+        reject(id, err, stdout, stderr);
+        return;
+      }
 
+      resolve(stdout);
+    });
+  });
+
+const folder = process.argv[2];
+
+const folderInitCommand = `mkdir ${process.argv[2]} && cd ${process.argv[2]}`;
+const npmInitCommand = `cd ${process.argv[2]} && npm install`;
+
+const buildPackageJson = () => {
+  const newPckJson = { ...packageJson };
+  newPckJson.name = process.argv[2];
+  newPckJson.version = '1.0.0';
+  delete newPckJson.homepage;
+  delete newPckJson.repository;
+  delete newPckJson.keywords;
+  delete newPckJson.author;
+  delete newPckJson.license;
+  delete newPckJson.bugs;
+  delete newPckJson.bin;
+  delete newPckJson.dependencies['fs-extra'];
+  return JSON.stringify(newPckJson, null, 2);
+};
+
+const writePackageJson = json =>
+  fs.writeFile(`${folder}/package.json`, json, () => {});
+
+executeCommand(folderInitCommand, 'folder')
+  .then(() => {
     // replace the default scripts, with the webpack scripts in package.json
-    let newPckJson = { ...packageJson };
-    newPckJson.name = process.argv[2];
-    newPckJson.version = '1.0.0';
-    delete newPckJson.homepage;
-    delete newPckJson.repository;
-    delete newPckJson.keywords;
-    delete newPckJson.author;
-    delete newPckJson.license;
-    delete newPckJson.bugs;
-    delete newPckJson.bin;
-    delete newPckJson.dependencies['fs-extra'];
-    const data = JSON.stringify(newPckJson, null, '\t');
-    fs.writeFile(`${process.argv[2]}/package.json`, data, err2 => err2 || true);
+    const packageJson = buildPackageJson();
+    writePackageJson(packageJson);
 
     for (let i = 0; i < filesToCopy.length; i += 1) {
       fs.createReadStream(path.join(__dirname, `../${filesToCopy[i]}`)).pipe(
@@ -49,15 +66,16 @@ exec(
     }
 
     // installing dependencies
-    exec(
-      `cd ${process.argv[2]} && npm install`,
-      (npmErr, npmStdout, npmStderr) => {
-        if (npmErr) {
-          console.error(`it's always npm, ain't it? ${npmErr}`);
-          return;
-        }
-        console.log('Everything ok');
-      }
-    );
-  }
-);
+    return executeCommand(npmInitCommand, 'npm');
+  })
+  .then(() => {
+    console.log('Everything ok');
+  })
+  .catch((id, err) => {
+    if (id === 'npm') {
+      console.error(`it's always npm, ain't it? ${npmErr}`);
+      return;
+    }
+
+    console.error(`Everything was fine, then it wasn't: ${initErr}`);
+  });
