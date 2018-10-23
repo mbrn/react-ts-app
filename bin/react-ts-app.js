@@ -5,7 +5,7 @@ const path = require('path');
 const { exec } = require('child_process');
 
 const packageJson = require('../package.json');
-const filesToCopy = ['.babelrc', '.gitignore', 'index.tsx', 'tsconfig.json'];
+const filesToCopy = ['.babelrc', 'index.tsx', 'tsconfig.json'];
 const foldersToCopy = ['configs', 'public', 'src'];
 
 // create folder and initialize npm
@@ -30,6 +30,9 @@ exec(`mkdir ${process.argv[2]} && cd ${process.argv[2]}`,
     delete newPckJson.dependencies["fs-extra"];
     const data = JSON.stringify(newPckJson, null, "\t");
     fs.writeFile(`${process.argv[2]}/package.json`, data, err2 => err2 || true);
+
+    // Create .gitignore
+    fs.writeFile(`${process.argv[2]}/.gitignore`, 'node_modules', err, err2 => err2 || true)
 
     for (let i = 0; i < filesToCopy.length; i += 1) {
       fs.createReadStream(path.join(__dirname, `../${filesToCopy[i]}`))
