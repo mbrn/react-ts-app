@@ -14,11 +14,8 @@ const npmInitCommand = `cd ${targetFolder} && npm install`;
 executeCommand(folderInitCommand, 'folder')
   .then(() => {
     // replace the default scripts, with the webpack scripts in package.json
-    console.log(buildPackageJson)
     const packageJson = buildPackageJson();
-    console.log('well screw')
     writePackageJson(packageJson);
-    console.log('well')
 
     writeAppFiles();
     copyAppFolders();
