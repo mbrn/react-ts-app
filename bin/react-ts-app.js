@@ -1,69 +1,27 @@
 #!/usr/bin/env node
 
-const fs = require('fs-extra');
-const path = require('path');
-const { exec } = require('child_process');
+const buildPackageJson = require('./utils/buildPackageJson');
+const copyAppFolders = require('./utils/copyAppFolders');
+const executeCommand = require('./utils/executeCommand');
+const writeAppFiles = require('./utils/writeAppFiles');
+const writePackageJson = require('./utils/writePackageJson');
 
-const packageJson = require('../package.json');
-const filesToCopy = ['.babelrc', '.gitignore', 'index.tsx', 'tsconfig.json'];
-const foldersToCopy = ['configs', 'public', 'src'];
+const targetFolder = process.argv[2];
 
-const executeCommand = (command, id) =>
-  new Promise((resolve) => {
-    exec(command, (err, stdout, stderr) => {
-      if (err) {
-        reject(id, err, stdout, stderr);
-        return;
-      }
-
-      resolve(stdout);
-    });
-  });
-
-const folder = process.argv[2];
-
-const folderInitCommand = `mkdir ${process.argv[2]} && cd ${process.argv[2]}`;
-const npmInitCommand = `cd ${process.argv[2]} && npm install`;
-
-const buildPackageJson = () => {
-  const newPckJson = { ...packageJson };
-  newPckJson.name = process.argv[2];
-  newPckJson.version = '1.0.0';
-  delete newPckJson.homepage;
-  delete newPckJson.repository;
-  delete newPckJson.keywords;
-  delete newPckJson.author;
-  delete newPckJson.license;
-  delete newPckJson.bugs;
-  delete newPckJson.bin;
-  delete newPckJson.dependencies['fs-extra'];
-  return JSON.stringify(newPckJson, null, 2);
-};
-
-const writePackageJson = json =>
-  fs.writeFile(`${folder}/package.json`, json, () => {});
+const folderInitCommand = `mkdir ${targetFolder} && cd ${targetFolder}`;
+const npmInitCommand = `cd ${targetFolder} && npm install`;
 
 executeCommand(folderInitCommand, 'folder')
   .then(() => {
     // replace the default scripts, with the webpack scripts in package.json
+    console.log(buildPackageJson)
     const packageJson = buildPackageJson();
+    console.log('well screw')
     writePackageJson(packageJson);
+    console.log('well')
 
-    for (let i = 0; i < filesToCopy.length; i += 1) {
-      fs.createReadStream(path.join(__dirname, `../${filesToCopy[i]}`)).pipe(
-        fs.createWriteStream(`${process.argv[2]}/${filesToCopy[i]}`)
-      );
-    }
-    for (let i = 0; i < foldersToCopy.length; i++) {
-      fs.copy(
-        path.join(__dirname, '../' + foldersToCopy[i]),
-        `${process.argv[2]}/${foldersToCopy[i]}`
-      )
-        .then(() =>
-          console.log(`${foldersToCopy[i]} copied ${process.argv[2]} folder`)
-        )
-        .catch(err => console.error(err));
-    }
+    writeAppFiles();
+    copyAppFolders();
 
     // installing dependencies
     return executeCommand(npmInitCommand, 'npm');
@@ -71,11 +29,6 @@ executeCommand(folderInitCommand, 'folder')
   .then(() => {
     console.log('Everything ok');
   })
-  .catch((id, err) => {
-    if (id === 'npm') {
-      console.error(`it's always npm, ain't it? ${npmErr}`);
-      return;
-    }
-
-    console.error(`Everything was fine, then it wasn't: ${initErr}`);
+  .catch((err) => {
+    console.error(`Everything was fine, then it wasn't: ${err}`);
   });
